@@ -2,10 +2,11 @@ package com.example.student.controller;
 
 import com.example.student.common.Result;
 import com.example.student.entity.Student;
+import com.example.student.exception.StudentNotFoundException;
 import com.example.student.service.StudentService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,8 +17,11 @@ import java.util.Optional;
 @RequestMapping("/students")
 public class StudentController {
 
-    @Autowired
-    private StudentService studentService;
+    private final StudentService studentService;
+
+    public StudentController(StudentService studentService) {
+        this.studentService = studentService;
+    }
 
     /**
      * 获取所有学生列表
@@ -56,7 +60,7 @@ public class StudentController {
      * POST /students
      */
     @PostMapping
-    public Result<Student> createStudent(@RequestBody Student student) {
+    public Result<Student> createStudent(@Valid @RequestBody Student student) {
         try {
             Student createdStudent = studentService.createStudent(student);
             return Result.success("创建学生成功", createdStudent);
@@ -70,11 +74,11 @@ public class StudentController {
      * PUT /students/{id}
      */
     @PutMapping("/{id}")
-    public Result<Student> updateStudent(@PathVariable Long id, @RequestBody Student student) {
+    public Result<Student> updateStudent(@PathVariable Long id, @Valid @RequestBody Student student) {
         try {
             Student updatedStudent = studentService.updateStudent(id, student);
             return Result.success("更新学生成功", updatedStudent);
-        } catch (RuntimeException e) {
+        } catch (StudentNotFoundException e) {
             return Result.error(404, e.getMessage());
         } catch (Exception e) {
             return Result.error("更新学生失败: " + e.getMessage());
@@ -90,7 +94,7 @@ public class StudentController {
         try {
             studentService.deleteStudent(id);
             return Result.success("删除学生成功", null);
-        } catch (RuntimeException e) {
+        } catch (StudentNotFoundException e) {
             return Result.error(404, e.getMessage());
         } catch (Exception e) {
             return Result.error("删除学生失败: " + e.getMessage());

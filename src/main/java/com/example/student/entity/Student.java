@@ -1,6 +1,7 @@
 package com.example.student.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 
 /**
  * 学生实体类
@@ -13,15 +14,21 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @NotBlank(message = "姓名不能为空")
     @Column(nullable = false)
     private String name;
     
+    @NotNull(message = "年龄不能为空")
+    @Min(value = 1, message = "年龄必须大于0")
+    @Max(value = 150, message = "年龄必须小于150")
     @Column(nullable = false)
     private Integer age;
     
+    @NotBlank(message = "年级不能为空")
     @Column(nullable = false)
     private String grade;
     
+    @NotBlank(message = "专业不能为空")
     @Column(nullable = false)
     private String major;
 

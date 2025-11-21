@@ -1,8 +1,8 @@
 package com.example.student.service;
 
 import com.example.student.entity.Student;
+import com.example.student.exception.StudentNotFoundException;
 import com.example.student.repository.StudentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,8 +14,11 @@ import java.util.Optional;
 @Service
 public class StudentService {
 
-    @Autowired
-    private StudentRepository studentRepository;
+    private final StudentRepository studentRepository;
+
+    public StudentService(StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
+    }
 
     /**
      * 获取所有学生
@@ -43,7 +46,7 @@ public class StudentService {
      */
     public Student updateStudent(Long id, Student studentDetails) {
         Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
+                .orElseThrow(() -> new StudentNotFoundException(id));
         
         student.setName(studentDetails.getName());
         student.setAge(studentDetails.getAge());
@@ -58,7 +61,7 @@ public class StudentService {
      */
     public void deleteStudent(Long id) {
         Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
+                .orElseThrow(() -> new StudentNotFoundException(id));
         studentRepository.delete(student);
     }
 }
